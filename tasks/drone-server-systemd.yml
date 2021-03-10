@@ -1,0 +1,18 @@
+---
+- name: "Create systemd Template file"
+  template:
+    src: "drone-server-systemd.service.j2"
+    dest: "/etc/systemd/system/drone-server-systemd.service"
+  register: drone_server_systemd_config
+  notify:
+  - "server systemd restart"
+  tags:
+    - configuration
+
+
+- name: "Enable and start the drone server"
+  systemd:
+    name: drone-server-systemd
+    state: started
+    enabled: True
+    daemon_reload: yes

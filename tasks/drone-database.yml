@@ -1,0 +1,17 @@
+---
+- name: Setup the database login variables
+  set_fact:
+    drone_database_datasource: "postgres://{{drone_postgres_username}}:{{drone_postgres_password}}@{{drone_postgres_url}}/drone"
+  when: drone_database_driver == "postgres"
+  tags:
+    - postgres
+    - database
+
+- name: Set the database secrets password
+  set_fact:
+    drone_database_secret: "{{drone_database_secret}}"
+  when: drone_database_driver == "postgres"
+  no_log: true
+  tags:
+    - postgres
+    - database

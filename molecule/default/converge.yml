@@ -1,0 +1,57 @@
+---
+- name: Converge
+  hosts: all
+  become: true
+
+  vars:
+    - drone_server_enable: "true"
+    - drone_database_driver: "sqlite"
+    - drone_github_server: "https://github.com"
+    - drone_github_debug: "true"
+    - drone_github_enable_always_auth: "true"
+    - drone_github_client_id: "718df6498976b8107117"
+    - drone_github_client_secret: "6338b896145a06d0f27bdd6f2039abe0bbaef63e"
+    - drone_database_driver: "sqlite"
+    - drone_enable_systemd: "true"
+    - drone_server_host: "drone.mattsnoby.com"
+    - drone_rpc_server: "drone.mattsnoby.com"
+    - drone_runner_name: "drone-server-runner"
+    - drone_server_proto: "http"
+    - drone_certs_from_vault: false
+    - drone_get_secrets_from_vault: false
+    - drone_install_certs: "false"
+    - drone_agent_enable: false
+    - drone_runner_capacity: 6
+    - drone_logs_debug: true
+    - docker_users:
+        - root
+
+  pre_tasks:
+    - name: Install prerequisites for Docker repository
+      apt:
+        name: ['apt-transport-https', 'ca-certificates', 'curl', 'gnupg2', 'software-properties-common']
+        update_cache: yes
+
+    - name: Add Docker GPG key
+      apt_key: url=https://download.docker.com/linux/ubuntu/gpg
+
+    - name: Add Docker APT repository
+      apt_repository:
+        repo: deb [arch=amd64] https://download.docker.com/{{ ansible_system | lower }}/{{ ansible_distribution | lower }} {{ ansible_distribution_release }} stable
+
+    - name: Install Docker CE
+      apt:
+        name: ['docker-ce', 'docker-ce-cli', 'containerd.io']
+        update_cache: yes
+
+
+  roles:
+    - role: drone
+
+
+  tasks:
+    - name: "Include drone"
+      include_role:
+        name: "drone"
+
+#- import_playbook: ../../basic_playbook.yml

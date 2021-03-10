@@ -1,0 +1,18 @@
+---
+# handlers file for ansible-drone
+- name: "server systemd restart"
+  systemd:
+    name: drone-server-systemd
+    state: restarted
+    enabled: True
+    daemon_reload: yes
+  when: drone_enable_systemd == "true"
+
+# handlers file for ansible-drone
+- name: "agent systemd restart"
+  systemd:
+    name: drone-agent-systemd
+    state: restarted
+    enabled: True
+    daemon_reload: yes
+  when: drone_enable_systemd == "true"

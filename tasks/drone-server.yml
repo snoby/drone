@@ -1,0 +1,51 @@
+---
+- name: verify that required database parameters
+  fail:
+    msg: "Variable '{{ item }}' is not defined for drone server setup"
+  when: item not in vars and drone_database_driver != "sqlite"
+  with_items:
+    - drone_database_datasource
+  tags:
+    - configuration
+
+- name: verify that required server parameters
+  fail:
+    msg: "Variable '{{ item }}' is not defined for drone server setup"
+  when: item not in vars
+  with_items:
+    - drone_server_host
+    - drone_server_proto
+  tags:
+    - configuration
+
+- name: verify that required server parameters with agent
+  fail:
+    msg: "Variable '{{ item }}' is not defined for drone server setup"
+  when: item not in vars and drone_agent_enable | bool == true
+  with_items:
+    - drone_rpc_secret
+  tags:
+    - configuration
+
+- name: generate env config for drone server
+  template:
+    src: "drone-server.env.j2"
+    dest: "/etc/drone/drone-server.env"
+  register: drone_server_config
+  notify:
+    - server systemd restart
+  tags:
+    - configuration
+
+- name: Creates sqlite directory
+  file:
+    path: "{{ drone_sqlite_host_data_dir }}"
+    state: directory
+    mode: 777
+    recurse: yes
+    owner: "{{ docker_users[0] }}"
+    group: "{{ docker_users[0] }}"
+  when: drone_database_driver == "sqlite"
+  register: drone_sqlite_folder
+  tags:
+    - drone-server

@@ -1,0 +1,3 @@
+---
+# vars file for ansible-drone
+drone_postgres_user: droneface

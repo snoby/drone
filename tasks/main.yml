@@ -1,0 +1,51 @@
+---
+# this include file setups a complete configuation
+- include_vars: home_lab_reverse_proxy_letsencrypt.yml
+  when: drone_home_lab_reverse_proxy_letsencrypt | default(false) | bool == true
+
+- include: setup.yml
+
+#
+#  If we are using vault
+#
+- include: vault.yml
+  when:
+    - drone_get_secrets_from_vault |default(False) | bool == True
+#
+#  If we are using vault
+#
+- include: vault-variables.yml
+  when:
+    - drone_get_secrets_from_vault |default(false) | bool == true
+
+- include: drone-database.yml
+  when: drone_database_driver != "sqlite"
+
+- include: drone-server.yml
+
+#
+# When install certs is enabled
+#
+
+- debug:
+    msg: " Drone certs from vault: {{ drone_certs_from_vault}}"
+
+- include: install-certs-local.yml
+  when:
+    - drone_certs_from_vault |default(false) | bool == false
+    - drone_install_certs |default(false) | bool == true
+
+- include: install-certs-vault.yml
+  when:
+    - drone_certs_from_vault |default(false) | bool == true
+
+  #  - drone_install_certs |default(false) | bool == true
+- include: drone-agent.yml
+  when: drone_agent_enable | default(false) | bool == true
+
+- include: drone-agent-systemd.yml
+  when: drone_agent_enable | default(false) | bool == true
+
+- include: drone-server-systemd.yml
+  #when: drone_enable_systemd |bool == true
+

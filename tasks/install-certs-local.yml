@@ -1,0 +1,29 @@
+---
+- name: "Create cert directory if necesasry"
+  become: true
+  file:
+    path: "{{ drone_certs_host_mount_path }}"
+    state: directory
+    mode: 0700
+  tags:
+    - certs
+
+- name: "Get certificate key file from local machine and place on remote"
+  become: true
+  copy:
+    dest: "{{ drone_certs_host_mount_path }}/{{ drone_cert_key_name }}"
+    content: "{{lookup('env', 'DRONE_SERVER_CERT_KEY')}}"
+    mode: 0600
+  tags:
+    - certs
+
+
+# todo make this adjustable.
+- name: "Install certificates for drone server from env value"
+  become: true
+  copy:
+    dest: "{{ drone_certs_host_mount_path }}/{{ drone_cert_name }}"
+    content: "{{ lookup('env', 'DRONE_SERVER_CERT') }}"
+    mode: 0600
+  tags:
+    - certs

@@ -1,0 +1,68 @@
+---
+- name: "Make sure necessary items are in place to call vault"
+  pip:
+    name:
+      - hvac
+  tags:
+    - configuration
+    - vault
+
+#
+# We are using a non standard method approle name to get a vault token.
+#
+- name: "Get the role_id and the secret_id from env file on the box"
+  shell:
+    cmd: cat /root/userdata.sh
+  register: userdata_content
+
+- name: "Setting role_id fact"
+  set_fact:
+    role_id: "{{ userdata_content.stdout | regex_search('APP_ROLE_ID=(.+)', '\\1') | first }}"
+
+- name: "Setting secret_id fact"
+  set_fact:
+    secret_id: "{{ userdata_content.stdout | regex_search('APP_ROLE_SECRET_ID=(.+)$', '\\1') | first }}"
+
+- name: some debug
+  debug:
+    msg: "role_id {{role_id}} and secret_id {{secret_id}}"
+
+- name: "Get vault token"
+  shell: "vault write auth/approle-drone/login role_id={{role_id}} secret_id={{secret_id}}"
+  environment:
+    VAULT_FORMAT: json
+    VAULT_ADDR: "https://east.keeper.cisco.com"
+    VAULT_NAMESPACE: "postdeploy/lma"
+  register: AUTHTOKEN_OUTPUT
+  tags:
+    - configuration
+    - vault
+
+- name:  "Set authtoken"
+  set_fact:
+    DRONE_VAULT_TOKEN: "{{ (AUTHTOKEN_OUTPUT.stdout | from_json).auth.client_token }}"
+  tags:
+    - configuration
+    - vault
+
+- name: "Client token is"
+  ansible.builtin.debug:
+    msg: "{{ DRONE_VAULT_TOKEN }}"
+  tags:
+    - configuration
+    - vault
+
+
+- name: "Now install the ansible-galaxy collection"
+  shell: "ansible-galaxy collection install community.general"
+  tags:
+    - configuration
+    - vault
+
+
+- name: "Attempt to login to vault with approle and get the drone certificates"
+  set_fact:
+    DRONE_CERTS:  "{{ lookup('community.general.hashi_vault', 'secret=secret/data/CI/tfe/certificates', namespace='postdeploy/lma',  url='https://east.keeper.cisco.com', auth_method='token', token=DRONE_VAULT_TOKEN) }}"
+  tags:
+    - configuration
+    - vault

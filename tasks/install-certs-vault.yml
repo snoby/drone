@@ -1,0 +1,39 @@
+---
+- name: "Create cert directory if necesasry"
+  become: true
+  file:
+    path: "{{drone_certs_host_mount_path}}"
+    state: directory
+    mode: 0700
+  tags:
+    - certs
+
+- name: "Attempt to login to vault with approle and get the drone certificates"
+  set_fact:
+    DRONE_CERTS:  "{{ lookup('community.general.hashi_vault', 'secret=secret/data/CI/tfe/certificates', namespace='postdeploy/lma',  url='https://east.keeper.cisco.com', auth_method='token', token=DRONE_VAULT_TOKEN) }}"
+  tags:
+    - certs
+    - vault
+
+- name: "Get certificate key file from vault"
+  become: true
+  copy:
+    dest: "{{ drone_certs_host_mount_path }}/{{ drone_cert_key_name }}"
+    content: "{{ DRONE_CERTS['key']  | b64decode }}"
+    mode: 0600
+  tags:
+    - certs
+    - vault
+
+
+# todo make this adjustable.
+- name: "Install certificates for drone server from env value"
+  become: true
+  copy:
+    dest: "{{ drone_certs_host_mount_path }}/{{ drone_cert_name }}"
+    src: '{{role_path}}/files/cert.cert'
+    mode: 0640
+    owner: 'root'
+  tags:
+    - certs
+    - vault

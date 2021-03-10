@@ -1,0 +1,57 @@
+---
+# This file is used to obtain all the variables we pull from vault.
+- name: "Obtain the postgres secrets from vault"
+  set_fact:
+    DRONE_VAULT_POSTGRES:  "{{ lookup('community.general.hashi_vault', 'secret=secret/data/CI/drone/postgres', namespace='postdeploy/lma',  url='https://east.keeper.cisco.com', auth_method='token', token=DRONE_VAULT_TOKEN) }}"
+  no_log: false
+  tags:
+    - configuration
+    - vault
+#
+# Set all the postgres variables
+#
+- name: "Setting all postgres variables from vault"
+  set_fact:
+    drone_postgres_username: "{{ DRONE_VAULT_POSTGRES['drone-postgres-username'] }}"
+    drone_postgres_password: "{{ DRONE_VAULT_POSTGRES['drone-postgres-password'] }}"
+    drone_postgres_url: "{{ DRONE_VAULT_POSTGRES['hostname'] }}"
+    drone_database_secret: "{{ DRONE_VAULT_POSTGRES['database_secret'] }}"
+  no_log: false
+  tags:
+    - configuration
+    - vault
+
+# Vault variables for github
+- name: "Obtain the SQBU github secrets from vault"
+  set_fact:
+    DRONE_VAULT_GITHUB:  "{{ lookup('community.general.hashi_vault', 'secret=secret/data/CI/drone/github', namespace='postdeploy/lma',  url='https://east.keeper.cisco.com', auth_method='token', token=DRONE_VAULT_TOKEN) }}"
+  no_log: true
+  tags:
+    - configuration
+    - vault
+
+
+- name: "Setting all Github variables from vault"
+  set_fact:
+    drone_github_client_id: "{{ DRONE_VAULT_GITHUB['client_id'] }}"
+    drone_github_client_secret: "{{ DRONE_VAULT_GITHUB['client_secret'] }}"
+  no_log: true
+  tags:
+    - configuration
+    - vault
+# Vault variables for agent and rpc variables
+- name: "Get the secret for agent and rpc"
+  set_fact:
+    DRONE_VAULT_AGENT:  "{{ lookup('community.general.hashi_vault', 'secret=secret/data/CI/drone/agent', namespace='postdeploy/lma',  url='https://east.keeper.cisco.com', auth_method='token', token=DRONE_VAULT_TOKEN) }}"
+  no_log: true
+  tags:
+    - configuration
+    - vault
+
+- name: "Setting all Github variables from vault"
+  set_fact:
+    drone_rpc_secret: "{{ DRONE_VAULT_AGENT['rpc_secret'] }}"
+  no_log: false
+  tags:
+    - configuration
+    - vault

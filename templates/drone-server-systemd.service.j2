@@ -1,0 +1,54 @@
+[Unit]
+Description=Drone running in docker container
+# Start this unit only after docker has started
+After=docker.service
+Requires=docker.service
+
+[Service]
+TimeoutStartSec=0
+Restart=always
+#needs to be fixed User = {{ drone_docker_owner }}
+# Group = {{ drone_docker_owner }}
+# The following lines start with '-' because they are allowed to fail without
+# causing startup to fail.
+#
+# Kill the old instance, if it's still running for some reason
+ExecStartPre=-/usr/bin/docker stop {{ drone_server_container_name }}
+# Remove the old instance, if it stuck around
+ExecStartPre=-/usr/bin/docker rm {{ drone_server_container_name }}
+ExecStart=/usr/bin/docker run --name {{ drone_server_container_name }} \
+{% if drone_default_server_volumes_to_mount is defined -%}
+  {%- for mounts in  drone_default_server_volumes_to_mount %}
+   -v {{ mounts }} \
+  {% endfor %}
+{% endif -%}
+{%- if 'sqlite' == drone_database_driver %}
+  -v {{ drone_sqlite_host_data_dir }}:/data \
+{% endif %}
+{%- if 'true' == drone_install_certs %}
+  -e DRONE_TLS_CERT=/etc/certs/{{drone_cert_name}} \
+  -v {{ drone_certs_host_mount_path }}/{{ drone_cert_name }}:/etc/certs/{{drone_cert_name}} \
+  -e DRONE_TLS_KEY=/etc/certs/{{drone_cert_key_name}} \
+  -v {{ drone_certs_host_mount_path }}/{{ drone_cert_key_name }}:/etc/certs/{{drone_cert_key_name}} \
+{% endif %}
+
+{%- if  drone_host_port80 is defined %}
+  -p {{ drone_host_port80 }}:80 \
+  {% else%}
+  -p :80 \
+{% endif %}
+{%- if drone_host_port443 is defined %}
+  -p {{ drone_host_port443 }}:443 \
+  {% else%}
+  -p :443 \
+{% endif %}
+--env-file /etc/drone/drone-server.env \
+--restart=always        \
+drone/drone:{{ drone_version }}
+
+
+# On exit, stop the container
+ExecStop=/usr/bin/docker stop {{ drone_server_container_name }}
+ExecStop=-/usr/bin/docker rm {{ drone_server_container_name }}
+[Install]
+WantedBy=multi-user.target

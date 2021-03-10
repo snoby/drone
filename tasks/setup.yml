@@ -1,0 +1,36 @@
+---
+- name: verify that required parameters are set for drone general setup
+  fail:
+    msg: "Variable '{{ item }}' is not defined for drone general setup"
+  when:
+    - item not in vars
+    - drone_agent_enable == "true"
+  with_items:
+    - drone_database_driver
+  tags:
+    - configuration
+
+- name: verify that required parameters are set when agents are requested for install.
+  fail:
+    msg: "Variable '{{ item }}' is not defined for drone server setup with agents enabled"
+  when:
+    - item not in vars
+    - drone_agent_enable == "true"
+  with_items:
+    - drone_rpc_secret
+    - drone_database_driver
+  tags:
+    - configuration
+
+- name: add config folder for drone
+  file:
+    path: "/etc/drone"
+    state: "directory"
+  tags:
+    - configuration
+# TODO: Fix me
+#- name: We want to add a user to the system that will run drone for docker
+#  user:
+#    name: "{{ drone_docker_owner }}"
+#    comment: The user that owns all the drone docker jobs
+#    groups: "{{ drone_docker_groups}}"
