@@ -3,6 +3,9 @@
 - include_vars: home_lab_reverse_proxy_letsencrypt.yml
   when: drone_home_lab_reverse_proxy_letsencrypt | default(false) | bool == true
 
+- include: approle-secrets.yml
+  when: drone_home_lab_reverse_proxy_letsencrypt | default(false) | bool == true
+
 - include: setup.yml
 
 #
@@ -27,9 +30,6 @@
 # When install certs is enabled
 #
 
-- debug:
-    msg: " Drone certs from vault: {{ drone_certs_from_vault}}"
-
 - include: install-certs-local.yml
   when:
     - drone_certs_from_vault |default(false) | bool == false
@@ -47,5 +47,3 @@
   when: drone_agent_enable | default(false) | bool == true
 
 - include: drone-server-systemd.yml
-  #when: drone_enable_systemd |bool == true
-
