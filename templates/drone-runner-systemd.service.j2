@@ -1,0 +1,35 @@
+[Unit]
+Description=Drone runner running in docker container
+# Start this unit only after docker has started
+After=docker.service
+Requires=docker.service
+
+[Service]
+TimeoutStartSec=0
+Restart=always
+# The following lines start with '-' because they are allowed to fail without
+# causing startup to fail.
+#
+User = {{ drone_docker_owner }}
+Group = {{ drone_docker_owner }}
+# Kill the old instance, if it's still running for some reason
+ExecStartPre=-/usr/bin/docker stop {{ drone_runner_container_name }}
+# Remove the old instance, if it stuck around
+ExecStartPre=-/usr/bin/docker rm {{ drone_runner_container_name }}
+ExecStart=/usr/bin/docker run --name {{ drone_runner_container_name }} \
+{% if drone_default_server_volumes_to_mount is defined -%}
+  {%- for mounts in  drone_default_server_volumes_to_mount %}
+   -v {{ mounts }} \
+  {% endfor %}
+{% endif -%}
+--env-file /etc/drone/drone-runner.env \
+--restart=always        \
+-p :3000                \
+drone/drone-runner-docker:{{ drone_runner_version }}
+
+
+# On exit, stop the container
+ExecStop=/usr/bin/docker stop {{ drone_runner_container_name }}
+ExecStop=-/usr/bin/docker rm {{ drone_runner_container_name }}
+[Install]
+WantedBy=multi-user.target

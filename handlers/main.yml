@@ -9,9 +9,18 @@
   when: drone_enable_systemd == "true"
 
 # handlers file for ansible-drone
-- name: "agent systemd restart"
+- name: "runner systemd restart"
   systemd:
-    name: drone-agent-systemd
+    name: drone-runner-systemd
+    state: restarted
+    enabled: True
+    daemon_reload: yes
+  when: drone_enable_systemd == "true"
+
+# handlers file for ansible-drone
+- name: "plugin vault systemd restart"
+  systemd:
+    name: drone-plugin-vault-systemd
     state: restarted
     enabled: True
     daemon_reload: yes

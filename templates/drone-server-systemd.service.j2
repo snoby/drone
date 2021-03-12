@@ -12,6 +12,7 @@ Restart=always
 # The following lines start with '-' because they are allowed to fail without
 # causing startup to fail.
 #
+
 # Kill the old instance, if it's still running for some reason
 ExecStartPre=-/usr/bin/docker stop {{ drone_server_container_name }}
 # Remove the old instance, if it stuck around

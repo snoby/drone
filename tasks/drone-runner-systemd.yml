@@ -1,0 +1,17 @@
+---
+- name: "Create systemd Template file"
+  template:
+    src: "drone-runner-systemd.service.j2"
+    dest: "/etc/systemd/system/drone-runner-systemd.service"
+  register: drone_runner_systemd_config
+  notify:
+    - "runner systemd restart"
+  tags:
+    - configuration
+
+- name: "Enable and start the drone server"
+  systemd:
+    name: drone-runner-systemd
+    state: started
+    enabled: True
+    daemon_reload: yes

@@ -1,0 +1,9 @@
+- name: copy config for drone plugin vault
+  template:
+    src: "drone-plugin-vault.env.j2"
+    dest: "/etc/drone/drone-plugin-vault.env"
+  register: drone_plugin_vault_config
+  notify:
+    - runner systemd restart
+  tags:
+    - configuration

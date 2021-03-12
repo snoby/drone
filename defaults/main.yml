@@ -2,13 +2,13 @@
 # server setting
 drone_server_enable: "false"
 drone_server_container_name: "drone-server"
-drone_agent_enable: "true"
+drone_runner_enable: "true"
 drone_version: "1.10.0"
-drone_agent_version: "1.6"
+drone_runner_version: "1.6.3"
 drone_logs_pretty: "true"
 drone_logs_color: "true"
 drone_rpc_server: "http://drone-server"
-drone_agent_container_name: "drone-agent"
+drone_runner_container_name: "drone-runner-docker"
 drone_runner_capacity: "3"
 drone_host_port: "8080"
 
@@ -80,3 +80,12 @@ drone_cert_name: "drone.crt"
 # defaults for user of drone process
 drone_docker_owner: drone
 drone_docker_groups: "docker"
+
+# defaults for drone-vault
+drone_vault_version: 1.2
+drone_plugin_vault_container_name: "drone-plugin-vault"
+
+#
+# Drone network
+#
+drone_network_name: "drone_network"

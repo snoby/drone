@@ -1,0 +1,19 @@
+---
+- name: verify that required parameters are set for drone runner setup
+  fail:
+    msg: "Variable '{{ item }}' is not defined for drone runner setup"
+  when: item not in vars
+  with_items:
+    - drone_rpc_server
+  tags:
+    - configuration
+
+- name: copy config for drone runner
+  template:
+    src: "drone-runner.env.j2"
+    dest: "/etc/drone/drone-runner.env"
+  register: drone_runner_config
+  notify:
+    - runner systemd restart
+  tags:
+    - configuration

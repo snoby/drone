@@ -8,6 +8,8 @@
 
 - include: setup.yml
 
+- include: drone-plugin-vault.yml
+- include: drone-plugin-vault-systemd.yml
 #
 #  If we are using vault
 #
@@ -40,10 +42,10 @@
     - drone_certs_from_vault |default(false) | bool == true
 
   #  - drone_install_certs |default(false) | bool == true
-- include: drone-agent.yml
-  when: drone_agent_enable | default(false) | bool == true
+- include: drone-runner.yml
+  when: drone_runner_enable | default(false) | bool == true
 
-- include: drone-agent-systemd.yml
-  when: drone_agent_enable | default(false) | bool == true
+- include: drone-runner-systemd.yml
+  when: drone_runner_enable | default(false) | bool == true
 
 - include: drone-server-systemd.yml

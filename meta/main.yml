@@ -1,7 +1,7 @@
 galaxy_info:
   role_name: drone
   author: Matt Snoby
-  description: Ansible role to configure drone (server and agent)
+  description: Ansible role to configure drone (server and runner)
   license: MIT
 
   min_ansible_version: 2.3
@@ -21,6 +21,5 @@ galaxy_info:
     - ci
     - droneci
     - devops
-
       # dependencies:
       #   - { role: geerlingguy.docker }

@@ -10,7 +10,7 @@
     - drone_github_debug: "true"
     - drone_github_enable_always_auth: "true"
     - drone_github_client_id: "718df6498976b8107117"
-    - drone_github_client_secret: "6338b896145a06d0f27bdd6f2039abe0bbaef63e"
+    - drone_github_client_secret: "get_from_vault"
     - drone_database_driver: "sqlite"
     - drone_enable_systemd: "true"
     - drone_server_host: "drone.mattsnoby.com"
@@ -29,7 +29,14 @@
   pre_tasks:
     - name: Install prerequisites for Docker repository
       apt:
-        name: ['apt-transport-https', 'ca-certificates', 'curl', 'gnupg2', 'software-properties-common']
+        name:
+          [
+            "apt-transport-https",
+            "ca-certificates",
+            "curl",
+            "gnupg2",
+            "software-properties-common",
+          ]
         update_cache: yes
 
     - name: Add Docker GPG key
@@ -41,17 +48,14 @@
 
     - name: Install Docker CE
       apt:
-        name: ['docker-ce', 'docker-ce-cli', 'containerd.io']
+        name: ["docker-ce", "docker-ce-cli", "containerd.io"]
         update_cache: yes
-
 
   roles:
     - role: drone
-
 
   tasks:
     - name: "Include drone"
       include_role:
         name: "drone"
-
 #- import_playbook: ../../basic_playbook.yml
