@@ -1,1 +1,4 @@
 molecule/default/converage.yml
+.venv
+.cache
+**/.DS_Store
