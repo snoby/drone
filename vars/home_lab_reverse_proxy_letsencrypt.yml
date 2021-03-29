@@ -31,6 +31,8 @@ drone_runner_enable: true
 drone_runner_capacity: 6
 
 drone_runner_virtual_hosting: true
+# Because we are doing virtual hosting we don't need a host port
+drone_runner_host_port: ""
 # NOTE: the runner protocol is https NOT http like the server, that's because the reverse proxy will send a 301 when connecting to the http port - This could  be changed if we went directly through the docker network, but let's try to keep it simple.
 drone_server_connection_protocol: "https"
 # enable for debugging
@@ -42,7 +44,11 @@ drone_prometheus_anonymous_access: true
 # enable vault integration
 #
 drone_plugin_vault_enabled: true
+drone_plugin_vault_secrets_from_env: true
+
 drone_plugin_vault_virtual_hosting: true
+# Because we are doing virtual hosting we don't need a host port
+drone_vault_plugin_host_port: ""
 # This is setup for lets encrypt to get a cert and do the ssl termination...
 # Understand that we have to set the runner to look at the https address or we have to
 # Allow the reverse proxy to not send the redirect.

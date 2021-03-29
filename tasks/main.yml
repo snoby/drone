@@ -1,15 +1,30 @@
 ---
 # this include file setups a complete configuation
+
+#
+# This only includes when running in the homelab environment
+#
 - include_vars: home_lab_reverse_proxy_letsencrypt.yml
   when: drone_home_lab_reverse_proxy_letsencrypt | default(false) | bool == true
 
 - include: approle-secrets.yml
   when: drone_home_lab_reverse_proxy_letsencrypt | default(false) | bool == true
 
-- include: setup.yml
+#
+# When running in the platform 3 datacenter
+# IN PRODUCTION
+- include_vars: platform_3_vault_certs.yml
+  when: drone_platform_3 |default(false) | bool == true
 
-- include: drone-plugin-vault.yml
-- include: drone-plugin-vault-systemd.yml
+#
+# When running in the platform 3 datacenter
+# IN DEV
+- include_vars: dev_platform_3_vault_certs.yml
+  when: drone_dev_platform_3 |default(false) | bool == true
+
+#
+# Need to get any secrets from vault before we begin
+#
 #
 #  If we are using vault
 #
@@ -23,6 +38,13 @@
   when:
     - drone_get_secrets_from_vault |default(false) | bool == true
 
+- include: setup.yml
+
+# This installs the plugin for drone to use vault
+- include: drone-plugin-vault.yml
+- include: drone-plugin-vault-systemd.yml
+
+# This will setup the postgres database
 - include: drone-database.yml
   when: drone_database_driver != "sqlite"
 

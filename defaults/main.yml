@@ -3,7 +3,7 @@
 drone_server_enable: "false"
 drone_server_container_name: "drone-server"
 drone_runner_enable: "true"
-drone_version: "1.10.0"
+drone_version: "latest"
 drone_runner_version: "1.6.3"
 drone_logs_pretty: "true"
 drone_logs_color: "true"

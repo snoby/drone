@@ -17,7 +17,7 @@ Restart=always
 ExecStartPre=-/usr/bin/docker stop {{ drone_server_container_name }}
 # Remove the old instance, if it stuck around
 ExecStartPre=-/usr/bin/docker rm {{ drone_server_container_name }}
-ExecStart=/usr/bin/docker run --name {{ drone_server_container_name }} \
+ExecStart=/usr/bin/docker run  -t --name {{ drone_server_container_name }} \
 {% if drone_default_server_volumes_to_mount is defined -%}
   {%- for mounts in  drone_default_server_volumes_to_mount %}
    -v {{ mounts }} \

@@ -2,8 +2,8 @@
 # This file is used to obtain all the variables we pull from vault.
 - name: "Obtain the postgres secrets from vault"
   set_fact:
-    DRONE_VAULT_POSTGRES:  "{{ lookup('community.general.hashi_vault', 'secret=secret/data/CI/drone/postgres', namespace='postdeploy/lma',  url='https://east.keeper.cisco.com', auth_method='token', token=DRONE_VAULT_TOKEN) }}"
-  no_log: false
+    DRONE_VAULT_POSTGRES: "{{ lookup('community.general.hashi_vault', 'secret=secret/data/CI/drone/postgres', namespace='postdeploy/lma',  url='https://east.keeper.cisco.com', auth_method='token', token=DRONE_VAULT_TOKEN) }}"
+  no_log: true
   tags:
     - configuration
     - vault
@@ -16,7 +16,37 @@
     drone_postgres_password: "{{ DRONE_VAULT_POSTGRES['drone-postgres-password'] }}"
     drone_postgres_url: "{{ DRONE_VAULT_POSTGRES['hostname'] }}"
     drone_database_secret: "{{ DRONE_VAULT_POSTGRES['database_secret'] }}"
+  no_log: true
+  tags:
+    - configuration
+    - vault
+
+- name: "Get plugin secrets to be used with the drone vault plugin"
+  set_fact:
+    DRONE_VAULT_VAULT: "{{ lookup('community.general.hashi_vault', 'secret=secret/data/CI/drone/vault-plugin', namespace='postdeploy/lma',  url='https://east.keeper.cisco.com', auth_method='token', token=DRONE_VAULT_TOKEN) }}"
+  no_log: true
+  tags:
+    - configuration
+    - vault
+
+- name: "Setting all the drone vault plugin facts"
+  set_fact:
+    drone_secret_plugin: "{{ DRONE_VAULT_VAULT['secret'] }}"
+    drone_vault_role_id: "{{ DRONE_VAULT_VAULT['drone_approle_role_id'] }}"
+    drone_vault_secret_id: "{{ DRONE_VAULT_VAULT['drone_approle_secret_id'] }}"
+  no_log: true
+  tags:
+    - configuration
+    - vault
+
+  #
+  # If we are running in dev mode get the dev and overwrite the variable
+  #
+- name: "Setting the dev variable for postgress hostname"
+  set_fact:
+    drone_postgres_url: "{{ DRONE_VAULT_POSTGRES['dev-hostname'] }}"
   no_log: false
+  when: drone_dev_platform_3 is defined
   tags:
     - configuration
     - vault
@@ -30,19 +60,30 @@
     - configuration
     - vault
 
-
-- name: "Setting all Github variables from vault"
+- name: "Setting PPRODUCTION Github variables from vault"
   set_fact:
     drone_github_client_id: "{{ DRONE_VAULT_GITHUB['client_id'] }}"
     drone_github_client_secret: "{{ DRONE_VAULT_GITHUB['client_secret'] }}"
   no_log: true
+  when: drone_platform_3 is defined
   tags:
     - configuration
     - vault
+
+- name: "Setting all DEV Github variables from vault"
+  set_fact:
+    drone_github_client_id: "{{ DRONE_VAULT_GITHUB['dev-client_id'] }}"
+    drone_github_client_secret: "{{ DRONE_VAULT_GITHUB['dev-client_secret'] }}"
+  no_log: true
+  when: drone_dev_platform_3 is defined
+  tags:
+    - configuration
+    - vault
+
 # Vault variables for agent and rpc variables
 - name: "Get the secret for agent and rpc"
   set_fact:
-    DRONE_VAULT_AGENT:  "{{ lookup('community.general.hashi_vault', 'secret=secret/data/CI/drone/agent', namespace='postdeploy/lma',  url='https://east.keeper.cisco.com', auth_method='token', token=DRONE_VAULT_TOKEN) }}"
+    DRONE_VAULT_AGENT: "{{ lookup('community.general.hashi_vault', 'secret=secret/data/CI/drone/agent', namespace='postdeploy/lma',  url='https://east.keeper.cisco.com', auth_method='token', token=DRONE_VAULT_TOKEN) }}"
   no_log: true
   tags:
     - configuration

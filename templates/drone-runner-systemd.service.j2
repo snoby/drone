@@ -10,13 +10,13 @@ Restart=always
 # The following lines start with '-' because they are allowed to fail without
 # causing startup to fail.
 #
-User = {{ drone_docker_owner }}
-Group = {{ drone_docker_owner }}
+#User = {{ drone_docker_owner }}
+#Group = {{ drone_docker_owner }}
 # Kill the old instance, if it's still running for some reason
 ExecStartPre=-/usr/bin/docker stop {{ drone_runner_container_name }}
 # Remove the old instance, if it stuck around
 ExecStartPre=-/usr/bin/docker rm {{ drone_runner_container_name }}
-ExecStart=/usr/bin/docker run --name {{ drone_runner_container_name }} \
+ExecStart=/usr/bin/docker run  -t --name {{ drone_runner_container_name }} \
 {% if drone_default_server_volumes_to_mount is defined -%}
   {%- for mounts in  drone_default_server_volumes_to_mount %}
    -v {{ mounts }} \
@@ -24,7 +24,7 @@ ExecStart=/usr/bin/docker run --name {{ drone_runner_container_name }} \
 {% endif -%}
 --env-file /etc/drone/drone-runner.env \
 --restart=always        \
--p :3000                \
+-p {{drone_runner_host_port}}:3000                \
 drone/drone-runner-docker:{{ drone_runner_version }}
 
 
