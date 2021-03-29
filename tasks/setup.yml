@@ -4,18 +4,18 @@
     msg: "Variable '{{ item }}' is not defined for drone general setup"
   when:
     - item not in vars
-    - drone_agent_enable == "true"
+    - drone_runner_enable == "true"
   with_items:
     - drone_database_driver
   tags:
     - configuration
 
-- name: verify that required parameters are set when agents are requested for install.
+- name: verify that required parameters are set when runners are requested for install.
   fail:
-    msg: "Variable '{{ item }}' is not defined for drone server setup with agents enabled"
+    msg: "Variable '{{ item }}' is not defined for drone server setup with runners enabled"
   when:
     - item not in vars
-    - drone_agent_enable == "true"
+    - drone_runner_enable == "true"
   with_items:
     - drone_rpc_secret
     - drone_database_driver

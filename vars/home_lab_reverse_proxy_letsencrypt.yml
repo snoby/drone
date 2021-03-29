@@ -8,6 +8,7 @@ drone_logs_debug: true
 drone_server_proto: "http"
 drone_enable_systemd: "true"
 drone_server_host: "drone.mattsnoby.com"
+domain_name: "mattsnoby.com"
 drone_database_driver: "sqlite"
 drone_sqlite_host_data_dir: "/mnt/data/drone"
 # enable for debugging
@@ -21,27 +22,41 @@ drone_github_client_id: "fill_in_with_vault"
 drone_github_client_secret: "fill_in_with_vault"
 
 #
-# Agent setup
+# runner setup
 #
 drone_rpc_secret: "fill_in_with_vault"
 drone_rpc_host: "drone.mattsnoby.com"
 drone_runner_name: "drone-server-runner"
-drone_agent_enable: true
+drone_runner_enable: true
 drone_runner_capacity: 6
-# NOTE: the agent protocol is https NOT http like the server, that's because the reverse proxy will send a 301 when connecting to the http port - This could  be changed if we went directly through the docker network, but let's try to keep it simple.
-drone_agent_proto: "https"
+
+drone_runner_virtual_hosting: true
+# Because we are doing virtual hosting we don't need a host port
+drone_runner_host_port: ""
+# NOTE: the runner protocol is https NOT http like the server, that's because the reverse proxy will send a 301 when connecting to the http port - This could  be changed if we went directly through the docker network, but let's try to keep it simple.
+drone_server_connection_protocol: "https"
 # enable for debugging
 #drone_logs_debug
 
 drone_prometheus_anonymous_access: true
 
+#
+# enable vault integration
+#
+drone_plugin_vault_enabled: true
+drone_plugin_vault_secrets_from_env: true
+
+drone_plugin_vault_virtual_hosting: true
+# Because we are doing virtual hosting we don't need a host port
+drone_vault_plugin_host_port: ""
 # This is setup for lets encrypt to get a cert and do the ssl termination...
-# Understand that we have to set the agent to look at the https address or we have to
+# Understand that we have to set the runner to look at the https address or we have to
 # Allow the reverse proxy to not send the redirect.
 drone_nginx_virtual_host: "drone.mattsnoby.com"
 drone_nginx_virtual_port: "80"
 drone_nginx_virtual_protocol: "http"
 drone_letsencrypt_email: "matt.snoby@icloud.com"
 drone_letsencrypt_host: "drone.mattsnoby.com"
+
 docker_users:
   - snoby
