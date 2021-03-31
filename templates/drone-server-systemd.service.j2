@@ -9,6 +9,8 @@ TimeoutStartSec=0
 Restart=always
 #needs to be fixed User = {{ drone_docker_owner }}
 # Group = {{ drone_docker_owner }}
+
+SyslogIdentifier={{ drone_server_container_name }}
 # The following lines start with '-' because they are allowed to fail without
 # causing startup to fail.
 #

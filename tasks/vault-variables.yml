@@ -54,7 +54,7 @@
 # Vault variables for github
 - name: "Obtain the SQBU github secrets from vault"
   set_fact:
-    DRONE_VAULT_GITHUB:  "{{ lookup('community.general.hashi_vault', 'secret=secret/data/CI/drone/github', namespace='postdeploy/lma',  url='https://east.keeper.cisco.com', auth_method='token', token=DRONE_VAULT_TOKEN) }}"
+    DRONE_VAULT_GITHUB: "{{ lookup('community.general.hashi_vault', 'secret=secret/data/CI/drone/github', namespace='postdeploy/lma',  url='https://east.keeper.cisco.com', auth_method='token', token=DRONE_VAULT_TOKEN) }}"
   no_log: true
   tags:
     - configuration

@@ -12,6 +12,7 @@ Restart=always
 #
 #User = {{ drone_docker_owner }}
 #Group = {{ drone_docker_owner }}
+SyslogIdentifier={{ drone_runner_container_name }}
 # Kill the old instance, if it's still running for some reason
 ExecStartPre=-/usr/bin/docker stop {{ drone_runner_container_name }}
 # Remove the old instance, if it stuck around
